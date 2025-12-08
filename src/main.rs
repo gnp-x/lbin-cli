@@ -6,9 +6,19 @@ use std::fs::{self, File};
 use std::io::prelude::*;
 use std::process::Command;
 
-/// lbin: CLI tool for bin.liminal.cafe. Links valid for 6 hours.
 #[derive(Parser, Debug)]
-#[command(author, version, about, group = ArgGroup::new("mode").required(true).multiple(false))]
+#[command(group = ArgGroup::new("mode").required(true).multiple(false))]
+#[command(about = r#"
+ ████  █████      ███
+▒▒███ ▒▒███      ▒▒▒
+ ▒███  ▒███████  ████  ████████
+ ▒███  ▒███▒▒███▒▒███ ▒▒███▒▒███
+ ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
+ ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
+ █████ ████████  █████ ████ █████
+▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
+- sakura <mail.liminal.pm.me>
+  "#)]
 struct Args {
     /// Not required if you run export AUTH_TOKEN=<token_here> in the terminal.
     #[arg(short, long, env("AUTH_TOKEN"), hide_env(true))]
@@ -59,7 +69,6 @@ fn main() -> Result<()> {
     if args.std_input {
         delete_file()?
     }
-
     Ok(())
 }
 
