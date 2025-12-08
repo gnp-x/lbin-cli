@@ -1,56 +1,53 @@
-use anyhow::{Result, bail};
-use clap::Parser;
+use anyhow::Result;
+use clap::{ArgGroup, Parser};
+use colored::Colorize;
 use regex::Regex;
+use std::fs::{self, File};
+use std::io::prelude::*;
 use std::process::Command;
 
-/// lbin: CLI tool for bin.liminal.cafe
+/// lbin: CLI tool for bin.liminal.cafe. Links valid for 6 hours.
 #[derive(Parser, Debug)]
-#[command(author, version, about)]
+#[command(author, version, about, group = ArgGroup::new("mode").required(true).multiple(false))]
 struct Args {
     /// Not required if you run export AUTH_TOKEN=<token_here> in the terminal.
     #[arg(short, long, env("AUTH_TOKEN"), hide_env(true))]
     auth_token: String,
     /// INPUT
     #[arg(value_name("INPUT"), required(true))]
-    input: String,
-    /// Use file option
-    #[arg(short, long)]
+    input: Vec<String>,
+    /// Upload a file
+    #[arg(short, long, group("mode"))]
     file: bool,
-    /// Use oneshot_file option
-    #[arg(short('o'), long)]
+    /// One-time use URL for an uploaded file
+    #[arg(short('o'), long, group("mode"))]
     oneshot_file: bool,
-    /// Use url option
-    #[arg(short, long)]
+    /// URL shortener
+    #[arg(short, long, group("mode"))]
     url: bool,
-    /// Use oneshot_url option
-    #[arg(short('O'), long)]
+    /// Make a one-time use URL
+    #[arg(short('O'), long, group("mode"))]
     oneshot_url: bool,
-    /// Use remote_url option
-    #[arg(short, long)]
+    /// Link a file from a remote URL
+    #[arg(short, long, group("mode"))]
     remote_url: bool,
+    /// Upload input. Note: You may need to use quotes around your input.
+    #[arg(short('i'), long, group("mode"))]
+    std_input: bool,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    let url_prefix = Regex::new(r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$").unwrap();
-
-    let result = match (
-        url_prefix.is_match(args.input.as_str()),
-        args.oneshot_url,
-        args.remote_url,
-        args.url,
-        args.file,
-        args.oneshot_file,
-    ) {
-        (true, true, false, false, false, false) => format!("oneshot_url={}", args.input),
-        (true, false, true, false, false, false) => format!("remote={}", args.input),
-        (true, false, false, true, false, false) => format!("url={}", args.input),
-        (false, false, false, false, true, false) => format!("file=@{}", args.input),
-        (false, false, false, false, false, true) => format!("oneshot=@{}", args.input),
-        _ => bail!("Not valid input."),
+    if args.std_input {
+        write_to_file(args.input.join(" ").as_str())?;
     };
 
+    let url_prefix = Regex::new(r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$").unwrap();
+
+    let input = args.input.join(" ");
+    let is_url = url_prefix.is_match(&input);
+    let result = result_formatter(&args, is_url, input);
     let header_auth = format!("Authorization: {}", args.auth_token);
     let server_address = "https://bin.liminal.cafe";
 
@@ -65,5 +62,46 @@ fn main() -> Result<()> {
         .status()
         .expect("Failed to run command.");
 
+    if args.std_input {
+        delete_file()?
+    }
+
+    Ok(())
+}
+
+fn result_formatter(args: &Args, is_url: bool, input: String) -> String {
+    if is_url {
+        if args.url {
+            format!("url={}", input)
+        } else if args.oneshot_url {
+            format!("oneshot_url={}", input)
+        } else if args.remote_url {
+            format!("remote={}", input)
+        } else {
+            eprintln!("{}", "Invalid command or input.".bright_red().bold());
+            std::process::exit(1)
+        }
+    } else {
+        if args.file {
+            format!("file=@{}", input)
+        } else if args.oneshot_file {
+            format!("oneshot=@{}", input)
+        } else if args.std_input {
+            format!("file=@temp_input")
+        } else {
+            eprintln!("{}", "Invalid command or input.".bright_red().bold());
+            std::process::exit(1)
+        }
+    }
+}
+
+fn write_to_file(input: &str) -> std::io::Result<()> {
+    let mut file = File::create("temp_input")?;
+    file.write_all(input.as_bytes())?;
+    Ok(())
+}
+
+fn delete_file() -> std::io::Result<()> {
+    fs::remove_file("temp_input")?;
     Ok(())
 }
