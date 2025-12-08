@@ -38,27 +38,21 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
+    let input = args.input.join(" ");
 
     if args.std_input {
-        write_to_file(args.input.join(" ").as_str())?;
+        write_to_file(&input)?;
     };
 
     let url_prefix = Regex::new(r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$").unwrap();
 
-    let input = args.input.join(" ");
     let is_url = url_prefix.is_match(&input);
     let result = result_formatter(&args, is_url, input);
     let header_auth = format!("Authorization: {}", args.auth_token);
     let server_address = "https://bin.liminal.cafe";
 
     Command::new("curl")
-        .args([
-            "-F",
-            result.as_str(),
-            "-H",
-            header_auth.as_str(),
-            server_address,
-        ])
+        .args(["-F", &result, "-H", &header_auth, server_address])
         .status()
         .expect("Failed to run command.");
 
