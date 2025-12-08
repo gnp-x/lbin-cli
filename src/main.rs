@@ -17,7 +17,7 @@ use std::process::Command;
  ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
  █████ ████████  █████ ████ █████
 ▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
-- sakura <mail.liminal.pm.me>
+- sakura <mail.liminal@pm.me>
   "#)]
 struct Args {
     /// Not required if you run export AUTH_TOKEN=<token_here> in the terminal.
