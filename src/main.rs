@@ -57,11 +57,6 @@ fn main() -> Result<()> {
         write_to_file(&input)?;
     };
 
-    // let url_prefix = Regex::new(
-    //     r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$",
-    // )?;
-
-    // let is_url = url_prefix.is_match(&input);
     let result = result_formatter(&args, input);
     let header_auth = format!("Authorization: {}", args.auth_token);
     let server_address = "https://bin.liminal.cafe";
