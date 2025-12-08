@@ -33,13 +33,13 @@ struct Args {
     #[arg(short, long, group("mode"))]
     file: bool,
     /// One-time use URL for an uploaded file
-    #[arg(short('o'), long, group("mode"))]
+    #[arg(short('F'), long, group("mode"))]
     oneshot_file: bool,
     /// URL shortener
     #[arg(short, long, group("mode"))]
     url: bool,
     /// Make a one-time use URL
-    #[arg(short('O'), long, group("mode"))]
+    #[arg(short('U'), long, group("mode"))]
     oneshot_url: bool,
     /// Link a file from a remote URL
     #[arg(short, long, group("mode"))]
