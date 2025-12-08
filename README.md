@@ -27,3 +27,6 @@ git clone https://codeberg.org/gnp/lbin.git
 cd lbin
 cargo build
 ```
+
+## Online
+You can check the online reference to lbin [over here](https://web.liminal.cafe/~sakura/lbin/).
