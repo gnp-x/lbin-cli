@@ -7,7 +7,7 @@ use std::io::prelude::*;
 use std::process::Command;
 
 #[derive(Parser, Debug)]
-#[command(group = ArgGroup::new("mode").required(true).multiple(false))]
+#[command(author ,group = ArgGroup::new("mode").required(true).multiple(false))]
 #[command(about = r#"
  ████  █████      ███
 ▒▒███ ▒▒███      ▒▒▒

@@ -2,7 +2,7 @@
 name = "lbin"
 version = "0.1.0"
 edition = "2024"
-author = "sakura <mail.liminal@pm.me>"
+authors = ["sakura <mail.liminal@pm.me>"]
 
 [dependencies]
 anyhow = "1.0.100"
