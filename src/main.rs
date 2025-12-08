@@ -1,12 +1,10 @@
 use anyhow::Result;
 use clap::{ArgGroup, CommandFactory, Parser};
-use colored::Colorize;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::process::Command;
 
 #[derive(Parser, Debug)]
-#[command(author, group = ArgGroup::new("mode").required(true).multiple(false))]
 #[command(about = r#"
  ████  █████      ███
 ▒▒███ ▒▒███      ▒▒▒
@@ -15,13 +13,19 @@ use std::process::Command;
  ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
  ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
  █████ ████████  █████ ████ █████
-▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
-- sakura <mail.liminal@pm.me>
+ ▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
   "#)]
+#[command(override_usage("lbin --auth <AUTH> [OPTIONS] <INPUT>..."))]
+#[command(
+    author,
+    version,
+    help_template("{about}\n({version}) - {author}\n\n{usage-heading} {usage}\n\n{all-args}")
+)]
+#[command(group = ArgGroup::new("mode").required(true).multiple(false))]
 struct Args {
-    /// Not required if you run export AUTH_TOKEN=<token_here> in the terminal.
-    #[arg(short, long, env("AUTH_TOKEN"), hide_env(true))]
-    auth_token: String,
+    /// Not required if you export AUTH=<token>.
+    #[arg(short, long, env("AUTH"), hide_env(true))]
+    auth: String,
     /// INPUT
     #[arg(value_name("INPUT"), required(true))]
     input: Vec<String>,
@@ -40,7 +44,7 @@ struct Args {
     /// Link a file from a remote URL
     #[arg(short, long, group("mode"))]
     remote_url: bool,
-    /// Upload input. Note: You may need to use quotes around your input.
+    /// Command-line input to file upload.
     #[arg(short('i'), long, group("mode"))]
     std_input: bool,
 }
@@ -58,7 +62,7 @@ fn main() -> Result<()> {
     };
 
     let result = result_formatter(&args, input);
-    let header_auth = format!("Authorization: {}", args.auth_token);
+    let header_auth = format!("Authorization: {}", args.auth);
     let server_address = "https://bin.liminal.cafe";
 
     Command::new("curl")
@@ -86,7 +90,7 @@ fn result_formatter(args: &Args, input: String) -> String {
     } else if args.std_input {
         format!("file=@temp_input")
     } else {
-        eprintln!("{}", "Invalid command or input.".bright_red().bold());
+        eprintln!("{}", "Invalid command or input.");
         std::process::exit(1)
     }
 }
