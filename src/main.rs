@@ -15,7 +15,7 @@ use std::process::Command;
  █████ ████████  █████ ████ █████
  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
   "#)]
-#[command(override_usage("lbin --auth <AUTH> [OPTIONS] <INPUT>..."))]
+#[command(override_usage("lbin -l <LBIN_AUTH> [OPTIONS] <INPUT>..."))]
 #[command(
     author,
     version,
@@ -23,9 +23,9 @@ use std::process::Command;
 )]
 #[command(group = ArgGroup::new("mode").required(true).multiple(false))]
 struct Args {
-    /// Not required if you export AUTH=<token>.
-    #[arg(short, long, env("AUTH"), hide_env(true))]
-    auth: String,
+    /// Not required if you export LBIN_AUTH=<token>.
+    #[arg(short, long, env("LBIN_AUTH"), hide_env(true))]
+    lbin_auth: String,
     /// INPUT
     #[arg(value_name("INPUT"), required(true))]
     input: Vec<String>,
@@ -62,7 +62,7 @@ fn main() -> Result<()> {
     };
 
     let result = result_formatter(&args, input);
-    let header_auth = format!("Authorization: {}", args.auth);
+    let header_auth = format!("Authorization: {}", args.lbin_auth);
     let server_address = "https://bin.liminal.cafe";
 
     Command::new("curl")
