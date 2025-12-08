@@ -1,7 +1,6 @@
 use anyhow::Result;
 use clap::{ArgGroup, CommandFactory, Parser};
 use colored::Colorize;
-use regex::Regex;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::process::Command;
@@ -58,10 +57,12 @@ fn main() -> Result<()> {
         write_to_file(&input)?;
     };
 
-    let url_prefix = Regex::new(r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$").unwrap();
+    // let url_prefix = Regex::new(
+    //     r"^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$",
+    // )?;
 
-    let is_url = url_prefix.is_match(&input);
-    let result = result_formatter(&args, is_url, input);
+    // let is_url = url_prefix.is_match(&input);
+    let result = result_formatter(&args, input);
     let header_auth = format!("Authorization: {}", args.auth_token);
     let server_address = "https://bin.liminal.cafe";
 
@@ -76,29 +77,22 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn result_formatter(args: &Args, is_url: bool, input: String) -> String {
-    if is_url {
-        if args.url {
-            format!("url={}", input)
-        } else if args.oneshot_url {
-            format!("oneshot_url={}", input)
-        } else if args.remote_url {
-            format!("remote={}", input)
-        } else {
-            eprintln!("{}", "Invalid command or input.".bright_red().bold());
-            std::process::exit(1)
-        }
+fn result_formatter(args: &Args, input: String) -> String {
+    if args.url {
+        format!("url={}", input)
+    } else if args.oneshot_url {
+        format!("oneshot_url={}", input)
+    } else if args.remote_url {
+        format!("remote={}", input)
+    } else if args.file {
+        format!("file=@{}", input)
+    } else if args.oneshot_file {
+        format!("oneshot=@{}", input)
+    } else if args.std_input {
+        format!("file=@temp_input")
     } else {
-        if args.file {
-            format!("file=@{}", input)
-        } else if args.oneshot_file {
-            format!("oneshot=@{}", input)
-        } else if args.std_input {
-            format!("file=@temp_input")
-        } else {
-            eprintln!("{}", "Invalid command or input.".bright_red().bold());
-            std::process::exit(1)
-        }
+        eprintln!("{}", "Invalid command or input.".bright_red().bold());
+        std::process::exit(1)
     }
 }
 
