@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::{ArgGroup, Parser};
+use clap::{ArgGroup, CommandFactory, Parser};
 use colored::Colorize;
 use regex::Regex;
 use std::fs::{self, File};
@@ -7,7 +7,7 @@ use std::io::prelude::*;
 use std::process::Command;
 
 #[derive(Parser, Debug)]
-#[command(author ,group = ArgGroup::new("mode").required(true).multiple(false))]
+#[command(author, group = ArgGroup::new("mode").required(true).multiple(false))]
 #[command(about = r#"
  ████  █████      ███
 ▒▒███ ▒▒███      ▒▒▒
@@ -47,9 +47,13 @@ struct Args {
 }
 
 fn main() -> Result<()> {
+    if std::env::args().len() == 1 {
+        Args::command().print_help()?;
+        std::process::exit(0);
+    }
+
     let args = Args::parse();
     let input = args.input.join(" ");
-
     if args.std_input {
         write_to_file(&input)?;
     };
