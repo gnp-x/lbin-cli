@@ -9,7 +9,6 @@
  ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
  █████ ████████  █████ ████ █████
  ▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
- -sakura <mail.liminal@pm.me>
 ```
  ## About
 lbin is designed to work exclusively with the file hosting service provided through [https://bin.liminal.cafe](https://bin.liminal.cafe), which is forked from [rustypaste](https://github.com/orhun/rustypaste).
