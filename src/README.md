@@ -1,10 +1,10 @@
 # Introduction
 
-lbin is designed to work exclusively with the file hosting service provided through [https://bin.liminal.cafe](https://bin.liminal.cafe), which is a pastebin [built by us](https://codeberg.org/gnp/lbin).
+lbin-cli is designed to work exclusively with the file hosting service provided through [https://bin.liminal.cafe](https://bin.liminal.cafe), which is a pastebin [built by us](https://codeberg.org/gnp/lbin).
 
-If you have any questions or have suggestions for lbin, please create an [issue](https://codeberg.org/gnp/lbin-cli/issues) over at the [repo](https://codeberg.org/gnp/lbin-cli).
+If you have any questions or have suggestions for lbin-cli, please create an [issue](https://codeberg.org/gnp/lbin-cli/issues) over at the [repo](https://codeberg.org/gnp/lbin-cli).
 
-*This is essentially an expanded version of `lbin -h` that doubles as an online reference.*
+*This is essentially an expanded version of `lbin-cli -h` that doubles as an online reference.*
 
 ## Compile
 ```
