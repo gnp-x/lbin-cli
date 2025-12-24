@@ -5,7 +5,7 @@ In order to use this service, you will need to set the [-l flag](./options.html)
 ## Use as flag
 You will need `-l <token>` as part of your command for every command.
 ```
-lbin -l <token> -F ./path/to/file
+lbin-cli -l <token> -F ./path/to/file
 ```
 
 ## Set in command line
