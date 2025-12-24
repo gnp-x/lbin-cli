@@ -5,21 +5,12 @@ use std::io::prelude::*;
 use std::process::Command;
 
 #[derive(Parser, Debug)]
-#[command(about = r#"
- ████  █████      ███
-▒▒███ ▒▒███      ▒▒▒
- ▒███  ▒███████  ████  ████████
- ▒███  ▒███▒▒███▒▒███ ▒▒███▒▒███
- ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
- ▒███  ▒███ ▒███ ▒███  ▒███ ▒███
- █████ ████████  █████ ████ █████
- ▒▒▒▒▒ ▒▒▒▒▒▒▒▒  ▒▒▒▒▒ ▒▒▒▒ ▒▒▒▒▒
-  "#)]
-#[command(override_usage("lbin -l <LBIN_AUTH> [OPTIONS] <INPUT>..."))]
+#[command(about = "lbin-cli")]
+#[command(override_usage("lbin-cli -l <LBIN_AUTH> [OPTIONS] <INPUT>..."))]
 #[command(
     author,
     version,
-    help_template("{about}\n({version}) - {author}\n\n{usage-heading} {usage}\n\n{all-args}")
+    help_template("{about} - {version}\n{usage-heading} {usage}\n\n{all-args}")
 )]
 #[command(group = ArgGroup::new("mode").required(true).multiple(false))]
 struct Args {
@@ -32,18 +23,6 @@ struct Args {
     /// Upload a file
     #[arg(short, long, group("mode"))]
     file: bool,
-    /// One-time use URL for an uploaded file
-    #[arg(short('F'), long, group("mode"))]
-    oneshot_file: bool,
-    /// URL shortener
-    #[arg(short, long, group("mode"))]
-    url: bool,
-    /// Make a one-time use URL
-    #[arg(short('U'), long, group("mode"))]
-    oneshot_url: bool,
-    /// Link a file from a remote URL
-    #[arg(short, long, group("mode"))]
-    remote_url: bool,
     /// Command-line input to file upload.
     #[arg(short('i'), long, group("mode"))]
     std_input: bool,
@@ -62,7 +41,7 @@ fn main() -> Result<()> {
     };
 
     let result = result_formatter(&args, input);
-    let header_auth = format!("Authorization: {}", args.lbin_auth);
+    let header_auth = format!("Authorization: Bearer {}", args.lbin_auth);
     let server_address = "https://bin.liminal.cafe";
 
     Command::new("curl")
@@ -77,18 +56,10 @@ fn main() -> Result<()> {
 }
 
 fn result_formatter(args: &Args, input: String) -> String {
-    if args.url {
-        format!("url={}", input)
-    } else if args.oneshot_url {
-        format!("oneshot_url={}", input)
-    } else if args.remote_url {
-        format!("remote={}", input)
-    } else if args.file {
+    if args.file {
         format!("file=@{}", input)
-    } else if args.oneshot_file {
-        format!("oneshot=@{}", input)
     } else if args.std_input {
-        format!("file=@temp_input")
+        format!("file=@temp_input.txt")
     } else {
         eprintln!("{}", "Invalid command or input.");
         std::process::exit(1)
@@ -96,12 +67,12 @@ fn result_formatter(args: &Args, input: String) -> String {
 }
 
 fn write_to_file(input: &str) -> std::io::Result<()> {
-    let mut file = File::create("temp_input")?;
+    let mut file = File::create("temp_input.txt")?;
     file.write_all(input.as_bytes())?;
     Ok(())
 }
 
 fn delete_file() -> std::io::Result<()> {
-    fs::remove_file("temp_input")?;
+    fs::remove_file("temp_input.txt")?;
     Ok(())
 }
