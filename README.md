@@ -6,7 +6,7 @@ If you have any questions or have suggestions for lbin-cli, please create an [is
 
 ## Compile
 ```
-git clone https://codeberg.org/gnp/lbin-cli.git
+git clone hhttps://git.liminal.cafe/sakura/lbin-cli.git
 cd lbin-cli
 cargo build --release
 ```
