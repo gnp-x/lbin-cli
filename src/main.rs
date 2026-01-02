@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::{ArgGroup, CommandFactory, Parser};
+use clap::Parser;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::process::Command;
@@ -12,7 +12,6 @@ use std::process::Command;
     version,
     help_template("{about} - {version}\n{usage-heading} {usage}\n\n{all-args}")
 )]
-#[command(group = ArgGroup::new("mode").required(true).multiple(false))]
 struct Args {
     /// Not required if you export LBIN_AUTH=<token>.
     #[arg(short, long, env("LBIN_AUTH"), hide_env(true))]
@@ -21,19 +20,17 @@ struct Args {
     #[arg(value_name("INPUT"), required(true))]
     input: Vec<String>,
     /// Upload a file
-    #[arg(short, long, group("mode"))]
+    #[arg(short, long)]
     file: bool,
-    /// Command-line input to file upload.
-    #[arg(short('i'), long, group("mode"))]
+    /// Command-line input to upload.
+    #[arg(short('i'), long, conflicts_with("file"))]
     std_input: bool,
+    /// How many minutes until file expires.
+    #[arg(short, long)]
+    time: Option<u64>,
 }
 
 fn main() -> Result<()> {
-    if std::env::args().len() == 1 {
-        Args::command().print_help()?;
-        std::process::exit(0);
-    }
-
     let args = Args::parse();
     let input = args.input.join(" ");
     if args.std_input {
@@ -41,11 +38,9 @@ fn main() -> Result<()> {
     };
 
     let result = result_formatter(&args, input);
-    let header_auth = format!("Authorization: Bearer {}", args.lbin_auth);
-    let server_address = "https://bin.liminal.cafe";
 
     Command::new("curl")
-        .args(["-F", &result, "-H", &header_auth, server_address])
+        .args(result)
         .status()
         .expect("Failed to run command.");
 
@@ -55,15 +50,26 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn result_formatter(args: &Args, input: String) -> String {
+fn result_formatter(args: &Args, input: String) -> Vec<String> {
+    let header_auth = format!("Authorization: Bearer {}", args.lbin_auth);
+    let server_address = "https://bin.liminal.cafe";
+    let mut result_vector = vec!["-F".to_owned()];
     if args.file {
-        format!("file=@{}", input)
+        result_vector.push(format!("file=@{input}"))
     } else if args.std_input {
-        format!("file=@temp_input.txt")
+        result_vector.push("file=@temp_input.txt".to_owned())
     } else {
         eprintln!("{}", "Invalid command or input.");
         std::process::exit(1)
     }
+    if let Some(n) = &args.time {
+        result_vector.push("-F".to_owned());
+        result_vector.push(format!("time={n}"))
+    }
+    result_vector.push("-H".to_owned());
+    result_vector.push(header_auth);
+    result_vector.push(server_address.to_owned());
+    result_vector
 }
 
 fn write_to_file(input: &str) -> std::io::Result<()> {
