@@ -10,3 +10,13 @@ lbin-cli -f /path/to/file
 ```
 lbin-cli -i This text will be available in an uploaded .txt file to read.
 ```
+
+## Expiry
+- This hosts the file for 5 minutes.
+```
+lbin-cli -f /path/to/file -t 5
+```
+- This hosts the file for 2 hours.
+```
+lbin-cli -i "Hello there." -t 120
+```
