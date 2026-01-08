@@ -20,3 +20,11 @@ lbin-cli -f /path/to/file -t 5
 ```
 lbin-cli -i "Hello there." -t 120
 ```
+## One-shot
+- This deletes the file once visited.
+```
+lbin-cli -o -f /path/to/file
+```
+```
+lbin-cli -o -i "Hello there."
+```
