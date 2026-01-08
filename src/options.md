@@ -12,5 +12,6 @@ Arguments:
 |  -f, - -file          |         Upload a file|
 |  -i, - -std-input|              Command-line input to upload|
 |  -t, - -time [TIME]|            How many minutes until file expires|
+|-o, --oneshot|                Upload a file that can only be seen once|
 |  -h, - -help    |               Print help|
 |  -V, - -version|                Print version|
