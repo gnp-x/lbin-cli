@@ -28,13 +28,16 @@ struct Args {
     /// How many minutes until file expires.
     #[arg(short, long)]
     time: Option<u64>,
+    /// Upload a file that can only be seen once.
+    #[arg(short, long)]
+    oneshot: bool,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
     let input = args.input.join(" ");
     if args.std_input {
-        write_to_file(&input)?;
+        write_to_file(&input)?
     };
 
     let result = result_formatter(&args, input);
@@ -68,7 +71,11 @@ fn result_formatter(args: &Args, input: String) -> Vec<String> {
     }
     result_vector.push("-H".to_owned());
     result_vector.push(header_auth);
-    result_vector.push(server_address.to_owned());
+    if args.oneshot {
+        result_vector.push(format!("{}/o", server_address.to_owned()))
+    } else {
+        result_vector.push(server_address.to_owned());
+    }
     result_vector
 }
 
