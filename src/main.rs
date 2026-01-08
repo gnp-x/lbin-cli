@@ -29,7 +29,7 @@ struct Args {
     #[arg(short, long)]
     time: Option<u64>,
     /// Upload a file that can only be seen once.
-    #[arg(short, long)]
+    #[arg(short, long, conflicts_with("time"))]
     oneshot: bool,
 }
 
